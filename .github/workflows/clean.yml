@@ -1,0 +1,44 @@
+name: Clean
+
+on:
+  - delete
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup environment variables
+        shell: bash
+        run: |
+          EVENT_REF=${{ github.event.ref }}
+          echo "${{ github.event }}"
+          echo ::set-env name=BRANCH::$(echo "${EVENT_REF##*/}")
+          echo ::set-env name=RELEASE_BRANCH::$(echo "master")
+          echo ::set-env name=DISCORD_WEBHOOK::${{ secrets.DISCORD_WEBHOOK }}
+      - name: Set target domain
+        run: |
+          DOMAIN_BASE="jas.bio"
+          if [ $BRANCH == "master" ];then
+            DOMAIN="https://${DOMAIN_BASE}"
+          else
+            DOMAIN="http://${BRANCH}.${DOMAIN_BASE}"
+          fi
+          echo "$DOMAIN"
+          echo ::set-env name=DOMAIN::$(echo "$DOMAIN")
+      - name: Surge tearing down ${{env.DOMAIN}}
+        run: npx surge teardown ${DOMAIN}
+        env:
+          SURGE_LOGIN: ${{secrets.SURGE_LOGIN}}
+          SURGE_TOKEN: ${{secrets.SURGE_TOKEN}}
+      - name: Discord notification
+        if: env.DISCORD_WEBHOOK != ''
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "Surge tore down ${{env.DOMAIN}} from https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}"
+      - name: Comment link on PR
+        if: github.event_name != 'delete'
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: "Surge tore down ${{env.DOMAIN}}"
