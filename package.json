@@ -25,7 +25,8 @@
 		"react-sidebar": "^3.0.2"
 	},
 	"devDependencies": {
-		"prettier": "^1.18.2"
+		"prettier": "^1.18.2",
+		"surge": "^0.21.3"
 	},
 	"keywords": [
 		"gatsby"
