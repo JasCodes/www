@@ -81,6 +81,7 @@ module.exports = {
         `gatsby-plugin-sharp`,
         `gatsby-transformer-sharp`,
         `gatsby-plugin-react-helmet`,
+        `gatsby-remark-embed-youtube`,
         {
             resolve: `gatsby-transformer-remark`,
             options: {
@@ -90,6 +91,13 @@ module.exports = {
                         resolve: `gatsby-remark-images`,
                         options: {
                             maxWidth: 1280
+                        }
+                    },
+                    {
+                        resolve: "gatsby-remark-embed-youtube",
+                        options: {
+                            width: 800,
+                            height: 400
                         }
                     }
                 ]
